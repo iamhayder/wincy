@@ -21,9 +21,13 @@ dotnet run --project src\Wincy
 For a single self-contained executable with no runtime to install:
 
 ```powershell
-dotnet publish src\Wincy -c Release
-# -> src\Wincy\bin\Release\net10.0-windows\win-x64\publish\Wincy.exe
+dotnet publish src\Wincy -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish
+# -> publish\Wincy.exe
 ```
+
+The runtime identifier is passed here rather than set in the project file on purpose.
+Pinning one to the Release configuration makes `restore` and `build -c Release` resolve
+different assets, which fails with NETSDK1047.
 
 Only the .NET 10 SDK is a hard requirement of the TFM, not of the code. If you have the
 .NET 8 SDK instead, change one line in `src/Wincy/Wincy.csproj`:

@@ -24,15 +24,20 @@
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  <PropertyGroup>
+    <!-- Shapes `dotnet publish` only; it has no effect on build or test. The runtime
+         identifier is deliberately NOT set here: pinning a RID to the Release
+         configuration makes `restore` (which runs as Debug) and `build -c Release`
+         resolve different assets, and the build then fails with NETSDK1047. Pass the
+         RID and self-contained flags on the publish command line instead. -->
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
+    <!-- 9.0.0 resolved SQLitePCLRaw 2.1.10, which carries GHSA-2m69-gcr7-jv3q.
+         This line pulls 2.1.12. -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
   </ItemGroup>
 
   <ItemGroup>

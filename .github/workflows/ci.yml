@@ -46,8 +46,16 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      # The runtime identifier belongs on this command, not in the project file:
+      # see the comment in Wincy.csproj.
       - name: Publish
-        run: dotnet publish src/Wincy/Wincy.csproj -c Release -o publish
+        run: >
+          dotnet publish src/Wincy/Wincy.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -o publish
 
       - name: Upload the executable
         uses: actions/upload-artifact@v4
