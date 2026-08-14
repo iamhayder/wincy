@@ -79,12 +79,21 @@
                         <TextBlock Text="{Binding MultiSelectionBadge}" FontSize="10.5" />
                     </Border>
 
-                    <!-- Shortcut badge for the modifiers currently held -->
-                    <Border x:Name="Shortcut" Grid.Column="4" Style="{StaticResource ShortcutBadge}" Margin="6,0,0,0"
-                            Visibility="{Binding HasVisibleShortcut, Converter={StaticResource BoolToVisibility}}">
-                        <TextBlock Text="{Binding VisibleShortcut.Description}"
-                                   Style="{StaticResource ShortcutBadgeText}" />
-                    </Border>
+                    <!-- Keycaps for whichever shortcut the currently held modifiers select -->
+                    <ItemsControl Grid.Column="4" Margin="4,0,0,0"
+                                  Style="{StaticResource KeycapStrip}"
+                                  ItemsSource="{Binding VisibleShortcut.Parts}"
+                                  ToolTip="{Binding VisibleShortcut.Description}"
+                                  Visibility="{Binding HasVisibleShortcut,
+                                      Converter={StaticResource BoolToVisibility}}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource RowKeycap}">
+                                    <TextBlock Text="{Binding}" Style="{StaticResource KeycapText}" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
             </Border>
 
@@ -92,7 +101,7 @@
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                     <Setter TargetName="RowRoot" Property="Background" Value="{DynamicResource AccentBrush}" />
                     <Setter TargetName="Title" Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
-                    <Setter TargetName="Shortcut" Property="Background" Value="#33FFFFFF" />
+                    <!-- The keycaps recolour themselves; see the RowKeycap style. -->
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
@@ -123,15 +132,12 @@
 
                         <TextBlock x:Name="FooterTitle" Text="{Binding Title}" VerticalAlignment="Center" />
 
-                        <ItemsControl Grid.Column="1" ItemsSource="{Binding Shortcuts}" VerticalAlignment="Center">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
+                        <ItemsControl Grid.Column="1" Style="{StaticResource KeycapStrip}"
+                                      ItemsSource="{Binding ShortcutParts}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Style="{StaticResource ShortcutBadge}" Margin="4,0,0,0">
-                                        <TextBlock Text="{Binding Description}"
-                                                   Style="{StaticResource ShortcutBadgeText}" />
+                                    <Border Style="{StaticResource RowKeycap}">
+                                        <TextBlock Text="{Binding}" Style="{StaticResource KeycapText}" />
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -222,38 +228,35 @@
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource SecondaryTextBrush}" />
 
-                <Border Grid.Column="1" Height="24" CornerRadius="{DynamicResource ItemCornerRadius}"
-                        Background="{DynamicResource FieldBackgroundBrush}">
-                    <Grid Margin="7,0,5,0">
+                <Border Grid.Column="1" Height="30" CornerRadius="6"
+                        Background="{DynamicResource FieldBackgroundBrush}"
+                        BorderBrush="{DynamicResource FieldBorderBrush}"
+                        BorderThickness="1"
+                        SnapsToDevicePixels="True">
+                    <Grid Margin="9,0,4,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- Magnifier -->
-                        <Path Grid.Column="0" Width="11" Height="11" Margin="0,0,6,0" Stretch="Uniform"
-                              VerticalAlignment="Center" Opacity="0.65"
-                              Fill="{DynamicResource TextBrush}"
-                              Data="M 9.5,8 A 4.5,4.5 0 1 0 9.5,-1 A 4.5,4.5 0 1 0 9.5,8 Z
-                                    M 9.5,6.5 A 3,3 0 1 1 9.5,0.5 A 3,3 0 1 1 9.5,6.5 Z
-                                    M 12.2,6.4 L 13.3,5.3 L 17,9 L 15.9,10.1 Z" />
+                        <!-- Search glyph, from the system icon font -->
+                        <TextBlock Grid.Column="0" Text="&#xE721;" Margin="0,0,8,0" FontSize="13"
+                                   Style="{StaticResource IconGlyph}" />
 
                         <TextBox x:Name="SearchBox" Grid.Column="1" Style="{StaticResource SearchBox}" />
 
-                        <TextBlock Grid.Column="1" Text="type to search…" IsHitTestVisible="False"
-                                   VerticalAlignment="Center" Opacity="0.55"
+                        <TextBlock Grid.Column="1" Text="Search…" IsHitTestVisible="False"
+                                   VerticalAlignment="Center" FontSize="13"
                                    Foreground="{DynamicResource SecondaryTextBrush}"
                                    Visibility="{Binding Text, ElementName=SearchBox,
                                        Converter={StaticResource NullToVisibilityInverted}}" />
 
                         <Button Grid.Column="2" x:Name="ClearSearchButton" Style="{StaticResource FlatButton}"
-                                Padding="2" ToolTip="Clear search"
+                                Width="22" Height="22" Padding="0" ToolTip="Clear search"
                                 Visibility="{Binding Text, ElementName=SearchBox,
                                     Converter={StaticResource NullToVisibility}}">
-                            <Path Width="10" Height="10" Stretch="Uniform" Fill="{DynamicResource SecondaryTextBrush}"
-                                  Data="M 2,3.1 L 3.1,2 L 8,6.9 L 12.9,2 L 14,3.1 L 9.1,8 L 14,12.9
-                                        L 12.9,14 L 8,9.1 L 3.1,14 L 2,12.9 L 6.9,8 Z" />
+                            <TextBlock Text="&#xE711;" FontSize="11" Style="{StaticResource IconGlyph}" />
                         </Button>
                     </Grid>
                 </Border>

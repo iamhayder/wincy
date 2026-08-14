@@ -18,6 +18,9 @@
     <Color x:Key="HoverBackgroundColor">#12000000</Color>
     <Color x:Key="BadgeBackgroundColor">#22000000</Color>
     <Color x:Key="HighlightColor">#FFF07A</Color>
+    <Color x:Key="FieldBorderColor">#26000000</Color>
+    <Color x:Key="KeycapBackgroundColor">#0E000000</Color>
+    <Color x:Key="KeycapBorderColor">#28000000</Color>
 
     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{DynamicResource WindowBackgroundColor}" />
     <SolidColorBrush x:Key="TextBrush" Color="{DynamicResource TextColor}" />
@@ -29,6 +32,9 @@
     <SolidColorBrush x:Key="HoverBackgroundBrush" Color="{DynamicResource HoverBackgroundColor}" />
     <SolidColorBrush x:Key="BadgeBackgroundBrush" Color="{DynamicResource BadgeBackgroundColor}" />
     <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource HighlightColor}" />
+    <SolidColorBrush x:Key="FieldBorderBrush" Color="{DynamicResource FieldBorderColor}" />
+    <SolidColorBrush x:Key="KeycapBackgroundBrush" Color="{DynamicResource KeycapBackgroundColor}" />
+    <SolidColorBrush x:Key="KeycapBorderBrush" Color="{DynamicResource KeycapBorderColor}" />
 
     <!-- Maccy's popup metrics, in device-independent pixels. -->
     <sys:Double x:Key="ItemHeight">24</sys:Double>

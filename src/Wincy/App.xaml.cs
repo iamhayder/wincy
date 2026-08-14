@@ -74,6 +74,9 @@ public partial class App : Application
             SetColor("HoverBackgroundColor", Color.FromArgb(0x16, 0xFF, 0xFF, 0xFF));
             SetColor("BadgeBackgroundColor", Color.FromArgb(0x2A, 0xFF, 0xFF, 0xFF));
             SetColor("HighlightColor", Color.FromRgb(0xFF, 0xD5, 0x4F));
+            SetColor("FieldBorderColor", Color.FromArgb(0x30, 0xFF, 0xFF, 0xFF));
+            SetColor("KeycapBackgroundColor", Color.FromArgb(0x18, 0xFF, 0xFF, 0xFF));
+            SetColor("KeycapBorderColor", Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF));
         }
         else
         {
@@ -85,6 +88,9 @@ public partial class App : Application
             SetColor("HoverBackgroundColor", Color.FromArgb(0x10, 0x00, 0x00, 0x00));
             SetColor("BadgeBackgroundColor", Color.FromArgb(0x20, 0x00, 0x00, 0x00));
             SetColor("HighlightColor", Color.FromRgb(0xB4, 0x6A, 0x00));
+            SetColor("FieldBorderColor", Color.FromArgb(0x26, 0x00, 0x00, 0x00));
+            SetColor("KeycapBackgroundColor", Color.FromArgb(0x0E, 0x00, 0x00, 0x00));
+            SetColor("KeycapBorderColor", Color.FromArgb(0x28, 0x00, 0x00, 0x00));
         }
 
         SetColor("AccentColor", accent);
@@ -109,6 +115,9 @@ public partial class App : Application
         SetBrush("HoverBackgroundBrush", (Color)Resources["HoverBackgroundColor"]);
         SetBrush("BadgeBackgroundBrush", (Color)Resources["BadgeBackgroundColor"]);
         SetBrush("HighlightBrush", (Color)Resources["HighlightColor"]);
+        SetBrush("FieldBorderBrush", (Color)Resources["FieldBorderColor"]);
+        SetBrush("KeycapBackgroundBrush", (Color)Resources["KeycapBackgroundColor"]);
+        SetBrush("KeycapBorderBrush", (Color)Resources["KeycapBorderColor"]);
     }
 
     protected override void OnExit(ExitEventArgs e)

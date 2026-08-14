@@ -19,6 +19,13 @@ public sealed class FooterItem : ObservableObject
 
     public List<KeyShortcut> Shortcuts { get; }
 
+    /// <summary>
+    /// The footer's shortcut as individual keys, so the row can draw keycaps without a
+    /// nested ItemsControl. Footer items never carry more than one shortcut.
+    /// </summary>
+    public IReadOnlyList<string> ShortcutParts =>
+        Shortcuts.Count > 0 ? Shortcuts[0].Parts : [];
+
     public string? ConfirmationMessage { get; }
 
     public string? ConfirmationDetail { get; }

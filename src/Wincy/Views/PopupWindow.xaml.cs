@@ -15,7 +15,9 @@ public partial class PopupWindow : Window
 {
     private const double RowHeight = 24;
     private const double SeparatorHeight = 13;
-    private const double HeaderHeight = 29;
+    // 5px top margin plus the 30px search field. Kept in step with PopupWindow.xaml,
+    // since the popup sizes itself from these numbers rather than from a layout pass.
+    private const double HeaderHeight = 35;
     private const double BannerHeight = 34;
     private const double VerticalPadding = 10;
 

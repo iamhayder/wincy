@@ -18,17 +18,32 @@ public sealed class KeyShortcut(string character, HotKeyModifiers modifiers)
 
     public HotKeyModifiers Modifiers { get; } = modifiers;
 
-    public string Description
+    /// <summary>
+    /// The shortcut split into individual keys, so the UI can draw one keycap each
+    /// rather than a single run of text. "Ctrl+1" reads as a keyboard shortcut;
+    /// <c>Ctrl</c> <c>1</c> reads as keys you press.
+    /// </summary>
+    public IReadOnlyList<string> Parts
     {
         get
         {
-            var text = string.Empty;
-            if (Modifiers.HasFlag(HotKeyModifiers.Control)) text += "Ctrl+";
-            if (Modifiers.HasFlag(HotKeyModifiers.Shift)) text += "Shift+";
-            if (Modifiers.HasFlag(HotKeyModifiers.Alt)) text += "Alt+";
-            return text + Character.ToUpperInvariant();
+            var parts = new List<string>(4);
+
+            if (Modifiers.HasFlag(HotKeyModifiers.Control)) parts.Add("Ctrl");
+            if (Modifiers.HasFlag(HotKeyModifiers.Shift)) parts.Add("Shift");
+            if (Modifiers.HasFlag(HotKeyModifiers.Alt)) parts.Add("Alt");
+            if (Modifiers.HasFlag(HotKeyModifiers.Windows)) parts.Add("Win");
+
+            // Single characters read better capitalised; named keys such as
+            // "Backspace" must keep their own casing.
+            parts.Add(Character.Length == 1 ? Character.ToUpperInvariant() : Character);
+
+            return parts;
         }
     }
+
+    /// <summary>Flat form, for tooltips and accessibility.</summary>
+    public string Description => string.Join("+", Parts);
 
     /// <summary>
     /// The trio of shortcuts for one row. The pairing of modifier to action follows
