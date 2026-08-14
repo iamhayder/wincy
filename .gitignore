@@ -1,0 +1,47 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+publish/
+artifacts/
+*.dll
+*.exe
+*.pdb
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+*.sln.docstates
+*.DotSettings.user
+.vscode/*
+!.vscode/extensions.json
+
+# NuGet
+*.nupkg
+packages/
+!packages/build/
+
+# Test and coverage output
+[Tt]est[Rr]esult*/
+coverage*.xml
+coverage*.json
+*.coverage
+*.trx
+
+# Wincy's own runtime data, in case anyone points it at the repo
+*.db
+*.db-wal
+*.db-shm
+wincy.log
+settings.json
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini

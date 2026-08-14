@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- .NET 10 is the current LTS. Nothing here needs >= net9 APIs, so you can
+         drop this to net8.0-windows if that is the SDK you have installed. -->
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Wincy</AssemblyName>
+    <RootNamespace>Wincy</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\Wincy.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Version>1.0.0</Version>
+    <Product>Wincy</Product>
+    <Company>Wincy</Company>
+    <Description>Clipboard history for Windows</Description>
+    <Copyright>MIT</Copyright>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- WPF implicitly imports System.Windows.Shapes, whose Path type collides with
+         System.IO.Path. The XAML side refers to Shapes.Path by tag name, so dropping
+         the C# import costs nothing and keeps file-path code unambiguous. -->
+    <Using Remove="System.Windows.Shapes" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Wincy.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Lets the tests reach internals such as ClipContent's lazy-load plumbing. -->
+    <InternalsVisibleTo Include="Wincy.Tests" />
+  </ItemGroup>
+
+</Project>

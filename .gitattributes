@@ -1,0 +1,27 @@
+# This repo is authored across platforms but targets Windows. Normalising line
+# endings here keeps diffs clean and stops Visual Studio and git disagreeing.
+* text=auto
+
+# Files Visual Studio and MSBuild are happiest reading as CRLF.
+*.sln       text eol=crlf
+*.csproj    text eol=crlf
+*.props     text eol=crlf
+*.targets   text eol=crlf
+*.manifest  text eol=crlf
+*.ps1       text eol=crlf
+*.cmd       text eol=crlf
+*.bat       text eol=crlf
+
+# Source and markup: LF in the repo, native on checkout.
+*.cs        text diff=csharp
+*.xaml      text
+*.md        text
+*.yml       text
+*.json      text
+
+# Never touch these.
+*.ico       binary
+*.png       binary
+*.jpg       binary
+*.db        binary
+*.snk       binary
