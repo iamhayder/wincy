@@ -1,0 +1,3 @@
+# Every change needs the maintainer's review. Combined with a branch rule requiring
+# review from Code Owners, this is what stops anything reaching main unreviewed.
+* @iamhayder

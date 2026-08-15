@@ -1,0 +1,24 @@
+version: 2
+
+updates:
+  # NuGet packages. Microsoft.Data.Sqlite pulls SQLitePCLRaw transitively, and a
+  # vulnerable version of it has already had to be chased down once by hand.
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      wix:
+        patterns:
+          - 'WixToolset.*'
+      test:
+        patterns:
+          - 'xunit*'
+          - 'Microsoft.NET.Test.Sdk'
+
+  # The actions used by CI and the release workflow.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

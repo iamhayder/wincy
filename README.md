@@ -1,93 +1,65 @@
+<div align="center">
+
 # Wincy
 
-Clipboard history for Windows. It keeps what you copy and lets you search it, pin it,
-and paste it back without leaving the keyboard.
+**Clipboard history for Windows.** Lightweight, keyboard-first, and entirely local.
 
-Wincy is a Windows counterpart to [Maccy](https://maccy.app), Alex Rodionov's macOS
-clipboard manager. It reproduces Maccy's behaviour and layout, but shares none of its
-code — this is a fresh implementation in C# on WPF and Win32.
+[![CI](https://github.com/iamhayder/wincy/actions/workflows/ci.yml/badge.svg)](https://github.com/iamhayder/wincy/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/iamhayder/wincy?sort=semver)](https://github.com/iamhayder/wincy/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/iamhayder/wincy/total)](https://github.com/iamhayder/wincy/releases)
+[![License](https://img.shields.io/github/license/iamhayder/wincy)](LICENSE)
 
-## Installing
+Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd>, type a few letters, press <kbd>Enter</kbd>.
 
-Grab the latest [release](https://github.com/iamhayder/wincy/releases):
+</div>
 
-- **`Wincy-x.y.z-x64.msi`** — the installer. Adds a Start Menu entry and appears in Add
-  or Remove Programs, so it uninstalls like anything else.
-- **`Wincy-x.y.z-portable-x64.exe`** — the same application in a single file. Nothing to
-  install; run it from wherever you like.
+<!--
+  A screenshot belongs here. Save one as docs/screenshot.png and uncomment:
 
-Either way the app is self-contained: there is no .NET runtime to install, and your
-history lives in `%LOCALAPPDATA%\Wincy`.
+  <p align="center">
+    <img src="docs/screenshot.png" alt="The Wincy popup, showing clipboard history with a search field" width="480">
+  </p>
+-->
 
-Neither download is code-signed, so SmartScreen will warn the first time you run it.
-Choose **More info**, then **Run anyway**. Uninstalling leaves `%LOCALAPPDATA%\Wincy`
-in place, so reinstalling keeps your history — delete that folder to remove it.
+---
 
-## Known limitations
+## Install
 
-**Wincy cannot paste into windows running as administrator.** Windows blocks synthetic
-keystrokes from a normal-integrity process to an elevated one, so with an admin terminal,
-Task Manager or Registry Editor in front, choosing an item copies it but the paste does
-not arrive. Press Ctrl+V yourself in that case. Copying *from* elevated applications is
-recorded normally, since the clipboard itself is shared.
+Download from the [latest release](https://github.com/iamhayder/wincy/releases/latest):
 
-There is no way around this that is worth the cost: running Wincy elevated would invert
-the problem and break pasting into ordinary applications, and the `uiAccess` route
-requires a code-signed binary installed under Program Files.
+| File | Use it if |
+|---|---|
+| **`Wincy-x.y.z-x64.msi`** | You want a normal install — Start Menu entry, listed in Add or Remove Programs |
+| **`Wincy-x.y.z-portable-x64.exe`** | You want a single file to run from anywhere, no install |
 
-## Building
+Both are self-contained: no .NET runtime to install. Wincy needs **Windows 10 1809 or
+newer**, 64-bit.
 
-Requires the **.NET 10 SDK** and Windows 10 1809 or newer.
+> [!NOTE]
+> Neither download is code-signed, so SmartScreen warns the first time you run it.
+> Choose **More info**, then **Run anyway**.
 
-```powershell
-git clone <this repo>
-cd wincy
-dotnet build
-dotnet run --project src\Wincy
-```
+## Features
 
-For a single self-contained executable with no runtime to install:
+- **Searchable history** — exact, fuzzy, regular expression, or all three in turn
+- **Keeps formatting** — rich text, HTML, images and files come back exactly as copied,
+  or paste as plain text on demand
+- **Pinning** — keep an item at the top with a permanent letter shortcut
+- **Keyboard-first** — the whole application is reachable without the mouse, and every
+  row shows what your current modifiers will do
+- **Native look** — acrylic backdrop, rounded corners, and light or dark following your
+  system theme and accent colour
+- **Private by design** — nothing leaves your machine, and copies from password managers
+  are never recorded
+- **Light on resources** — event-driven rather than polling, with images compressed and
+  history loaded lazily
 
-```powershell
-dotnet publish src\Wincy -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish
-# -> publish\Wincy.exe
-```
+## Usage
 
-The runtime identifier is passed here rather than set in the project file on purpose.
-Pinning one to the Release configuration makes `restore` and `build -c Release` resolve
-different assets, which fails with NETSDK1047.
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> opens the popup, or click the tray icon.
+Then type to search.
 
-To build the installer, point it at that executable:
-
-```powershell
-dotnet build installer\Wincy.Installer.wixproj -c Release -p:WincyExe=$PWD\publish\Wincy.exe -o installer\out
-# -> installer\out\Wincy.msi
-```
-
-The installer is a [WiX](https://wixtoolset.org) project and is deliberately **not** part
-of `Wincy.sln`, since building an MSI needs Windows and would otherwise stop the solution
-building on other platforms. CI builds it on every push, so a broken installer surfaces
-straight away rather than at release time.
-
-Tagging `v*` runs the release workflow, which builds both artefacts and publishes them to
-a GitHub Release.
-
-Only the .NET 10 SDK is a hard requirement of the TFM, not of the code. If you have the
-.NET 8 SDK instead, change one line in `src/Wincy/Wincy.csproj`:
-
-```xml
-<TargetFramework>net8.0-windows</TargetFramework>
-```
-
-There is nothing to install and no MSIX packaging: Wincy is one executable that keeps
-its data in `%LOCALAPPDATA%\Wincy`.
-
-## Using it
-
-Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> to open the popup, or click the tray
-icon. Then type to search.
-
-| | |
+| Shortcut | Does |
 |---|---|
 | <kbd>Enter</kbd> | Copy the selected item |
 | <kbd>Alt</kbd>+<kbd>Enter</kbd> | Copy **and paste** it |
@@ -95,7 +67,7 @@ icon. Then type to search.
 | <kbd>Ctrl</kbd>+<kbd>1</kbd>…<kbd>9</kbd> | Copy the *n*-th item directly |
 | <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> | Paste the *n*-th item directly |
 | <kbd>↑</kbd> <kbd>↓</kbd> | Move the selection |
-| <kbd>PgUp</kbd> / <kbd>PgDn</kbd> | Jump to the first / last item |
+| <kbd>PgUp</kbd> / <kbd>PgDn</kbd> | First / last item |
 | <kbd>Alt</kbd>+<kbd>P</kbd> | Pin or unpin |
 | <kbd>Alt</kbd>+<kbd>Backspace</kbd> | Delete the item |
 | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Backspace</kbd> | Clear unpinned items |
@@ -104,58 +76,121 @@ icon. Then type to search.
 | <kbd>Ctrl</kbd>+<kbd>,</kbd> | Preferences |
 | <kbd>Esc</kbd> | Close |
 
-The badge on the right of each row always shows what the modifiers you are *currently*
-holding will do, so you never have to remember the table above.
+You never have to memorise that table: the keycaps on the right of each row always show
+what the modifiers you are currently holding will do.
 
-**Pinning** moves an item to the top of the list and gives it a permanent letter. From
-then on <kbd>Ctrl</kbd>+<kbd>that letter</kbd> copies it and <kbd>Alt</kbd>+<kbd>that
-letter</kbd> pastes it, from anywhere in the list.
+**Pinning** moves an item to the top and gives it a permanent letter. From then on
+<kbd>Ctrl</kbd>+<kbd>letter</kbd> copies it and <kbd>Alt</kbd>+<kbd>letter</kbd> pastes
+it, wherever it is in the list.
 
-**Cycling**: hold <kbd>Ctrl</kbd>+<kbd>Shift</kbd> and tap <kbd>V</kbd> repeatedly to
-step down the history. Release the modifiers and the item you landed on is taken. This
-is the fastest way to reach the last few things you copied.
+**Cycling** is the fast path to the last few things you copied: hold
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd> and tap <kbd>V</kbd> repeatedly to step down the
+history. Release the modifiers and the item you landed on is taken.
 
 **Pausing**: <kbd>Alt</kbd>-click the tray icon to stop recording;
-<kbd>Alt</kbd>+<kbd>Shift</kbd>-click it to skip only the next copy.
+<kbd>Alt</kbd>+<kbd>Shift</kbd>-click to skip only the next copy.
 
-Emacs-style navigation (<kbd>Ctrl</kbd>+<kbd>N</kbd>/<kbd>P</kbd>/<kbd>J</kbd>/<kbd>K</kbd>,
-<kbd>Ctrl</kbd>+<kbd>U</kbd>/<kbd>W</kbd>/<kbd>H</kbd> in the search field) works too.
+Emacs-style navigation works too — <kbd>Ctrl</kbd>+<kbd>N</kbd>/<kbd>P</kbd>/<kbd>J</kbd>/<kbd>K</kbd>
+to move, and <kbd>Ctrl</kbd>+<kbd>U</kbd>/<kbd>W</kbd>/<kbd>H</kbd> to edit the search.
 
-## What it stores
+## Preferences
 
-Text, rich text, HTML, images and file paths — each as the exact bytes the source
-application published, so pasting reproduces the original rather than an approximation.
-Images are transcoded to PNG on capture, which keeps a history full of screenshots to
-megabytes rather than gigabytes.
+<kbd>Ctrl</kbd>+<kbd>,</kbd>, or right-click the tray icon.
 
-Everything lives in a single SQLite database in `%LOCALAPPDATA%\Wincy\history.db`.
-Nothing is sent anywhere. There is no network code in this application.
+| Pane | Covers |
+|---|---|
+| **General** | Launch at login, shortcuts, search mode, whether Enter copies or pastes |
+| **Storage** | Which kinds to save, how many items, sort order, database size |
+| **Appearance** | Where the popup opens and on which screen, pin placement, highlight style, preview side and timing, tray icon, which chrome to show |
+| **Pins** | Reassign or release pin letters |
+| **Ignore** | Applications, patterns, clipboard formats |
+| **Advanced** | Pause recording, clearing behaviour, clipboard settle delay, logs |
 
 ## Privacy
+
+Your history stays on your machine. **There is no network code in this application.**
 
 Wincy honours the standard Windows clipboard privacy formats, so copies from password
 managers and private browsing sessions are never recorded:
 
 - `ExcludeClipboardContentFromMonitorProcessing`
-- `CanIncludeInClipboardHistory` (set to 0)
-- `CanUploadToCloudClipboard` (set to 0)
+- `CanIncludeInClipboardHistory` set to zero
+- `CanUploadToCloudClipboard` set to zero
 - `Clipboard Viewer Ignore`
 
-Beyond that, **Preferences → Ignore** lets you exclude applications by executable name,
-discard copies matching a regular expression, and add further clipboard formats to the
-ignore list.
+Beyond that, **Preferences → Ignore** excludes applications by executable name, discards
+copies matching a regular expression, and takes further clipboard formats.
 
-## Preferences
+Everything lives in `%LOCALAPPDATA%\Wincy`. That folder is **not** encrypted and survives
+uninstall — delete it if you want the history gone. See [SECURITY.md](SECURITY.md) for
+the reasoning.
 
-Six panes, mirroring Maccy's:
+## FAQ
 
-- **General** — launch at login, shortcuts, search mode, whether Enter copies or pastes
-- **Storage** — which kinds to save, how many items, sort order, database size
-- **Appearance** — where the popup opens, on which screen, pin placement, highlight
-  style, preview timing, tray icon, and which chrome to show
-- **Pins** — reassign or release pin letters
-- **Ignore** — applications, patterns, clipboard formats
-- **Advanced** — pause recording, clearing behaviour, clipboard settle delay, logs
+**Why not <kbd>Win</kbd>+<kbd>V</kbd>?**
+Windows reserves it for its own clipboard history and will not hand it to another
+application. Change Wincy's shortcut under Preferences → General.
+
+**Nothing happens when I press the shortcut.**
+Something else has claimed it. Wincy says so at startup if registration failed; pick a
+different combination in Preferences → General.
+
+**It copies but does not paste.**
+Check "Paste automatically" in Preferences → General, and see the limitation below about
+windows running as administrator.
+
+**Where is my data?**
+`%LOCALAPPDATA%\Wincy` — `history.db` and `settings.json`. The log next to them,
+`wincy.log`, is the first place to look if something misbehaves.
+
+**Can I sync between machines?**
+No. That would mean sending your clipboard somewhere, which this application does not do.
+
+## Known limitations
+
+**Wincy cannot paste into windows running as administrator.** Windows blocks synthetic
+keystrokes from a normal-integrity process into an elevated one, so with an admin
+terminal, Task Manager or Registry Editor in front, choosing an item copies it but the
+paste never arrives — press <kbd>Ctrl</kbd>+<kbd>V</kbd> yourself. Copying *from*
+elevated applications is recorded normally, since the clipboard itself is shared.
+
+There is no fix worth its cost: running Wincy elevated would invert the problem and break
+pasting into ordinary applications, and the `uiAccess` route needs a code-signed binary
+installed under Program Files.
+
+Beyond that: English only, no update checker, and the popup is resized from Preferences
+rather than by dragging.
+
+## Building
+
+Requires the **.NET 10 SDK**.
+
+```powershell
+git clone https://github.com/iamhayder/wincy.git
+cd wincy
+dotnet build
+dotnet test
+dotnet run --project src\Wincy
+```
+
+A single self-contained executable:
+
+```powershell
+dotnet publish src\Wincy -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish
+```
+
+The installer, pointed at that executable:
+
+```powershell
+dotnet build installer\Wincy.Installer.wixproj -c Release -p:WincyExe=$PWD\publish\Wincy.exe -o installer\out
+```
+
+Nothing in the code needs .NET 10 specifically; change `TargetFramework` in
+`src/Wincy/Wincy.csproj` to `net8.0-windows` if that is the SDK you have.
+
+Tagging `v*` runs the release workflow, which builds both artefacts and publishes them.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for layout, house style and pull requests.
 
 ## How it works
 
@@ -167,68 +202,35 @@ Six panes, mirroring Maccy's:
 | Pasting | `SendInput` Ctrl+V, after handing focus back with `AttachThreadInput` |
 | Window look | DWM acrylic backdrop, rounded corners and dark mode via `DwmSetWindowAttribute` |
 | Tray icon | `Shell_NotifyIcon` directly — no WinForms dependency |
-| Storage | SQLite, with content blobs read lazily and deduplicated by hash |
+| Storage | SQLite, with content blobs read lazily and duplicates detected by hash |
 
-Wincy is event-driven rather than polled. Maccy checks `NSPasteboard.changeCount` every
-500 ms; Windows will simply tell you when the clipboard changes, so there is no timer.
-What replaces it is a short *settle delay* (Preferences → Advanced): many applications
-publish their formats in several passes, and reading the instant the notification
-arrives would capture only the first one.
+Wincy is event-driven rather than polled: Windows announces clipboard changes, so there
+is no timer. What replaces it is a short **settle delay** (Preferences → Advanced), since
+many applications publish their formats across several passes and reading the instant the
+notification arrives would capture only the first.
 
-### Layout
+## Credits
 
-```
-src/Wincy/
-├── Interop/      Win32: clipboard, hotkeys, hooks, DWM, tray, monitors, icons
-├── Models/       ClipItem, ClipContent, clipboard format bookkeeping
-├── Services/     capture and write-back, search, sorting, storage, settings
-├── ViewModels/   AppState, history, navigation, footer, shortcut matrix
-├── Views/        popup, preferences, about, and the custom row renderer
-└── Themes/       colours and control styles, re-derived from the system theme
+Wincy is an independent Windows implementation of [Maccy](https://maccy.app), the macOS
+clipboard manager by Alex Rodionov. It reproduces Maccy's behaviour and interaction
+design and contains none of its code.
 
-tests/Wincy.Tests/
-                  clipboard format parsers, search, dedup, sorting, colour
-                  swatches, screen placement, and the modifier matrix
+Some things could not carry over unchanged:
 
-installer/        WiX sources for the MSI
-```
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> rather than <kbd>Win</kbd>+<kbd>V</kbd>,
+  which Windows reserves.
+- Clear is <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Backspace</kbd>;
+  <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Delete</kbd> is the Secure Attention Sequence and
+  cannot be intercepted by any application.
+- Sounds are off by default — the Windows alert sounds are assertive enough that a chime
+  on every copy reads as a fault.
+- The preview does not open by itself, since widening the window while you read the list
+  is disruptive unless asked for.
+- Images are stored as PNG, with a DIB regenerated on paste. An uncompressed Windows DIB
+  would turn a few hundred screenshots into gigabytes.
+- Notifications are tray balloons rather than toasts, which would require an MSIX
+  identity and stop Wincy being a file you can copy anywhere.
 
-## Tests
+## License
 
-```powershell
-dotnet test
-```
-
-The suite covers the parts that can be checked without a screen: the HDROP, HTML and
-RTF parsers, all four search modes and their match ranges, hash-based duplicate
-detection, sort and pin ordering, colour-swatch parsing, and the copy/paste modifier
-matrix — including a check that every action stays reachable under all four
-combinations of the two "by default" settings.
-
-The tests reference the app assembly, which targets Windows, so `dotnet test` needs to
-run on Windows. CI does this on every push.
-
-## Deliberate differences from Maccy
-
-Some of Maccy's behaviour does not survive the move to Windows unchanged:
-
-- **The shortcut is Ctrl+Shift+V, not Win+V.** Windows reserves Win+V for its own
-  clipboard history and will not hand it to another process.
-- **Clear is Ctrl+Alt+Backspace, not Ctrl+Alt+Delete.** Ctrl+Alt+Delete is the Secure
-  Attention Sequence and cannot be intercepted by any application.
-- **Sounds are off by default.** Maccy plays one on every copy; the Windows alert sounds
-  are assertive enough that doing the same reads as a fault. Turn it on in General.
-- **The preview does not open by itself.** Widening the window while you are reading the
-  list is disruptive unless you asked for it. Alt+Space opens it, and Appearance has both
-  the automatic setting and a choice of which side it appears on.
-- **Images are stored as PNG.** Maccy keeps the original representation; a Windows DIB is
-  uncompressed, so a few hundred screenshots would run to gigabytes. A DIB is
-  regenerated on paste, so compatibility is unaffected.
-- **Notifications use a tray balloon**, not a toast. Toasts require an MSIX identity,
-  and Wincy is deliberately a plain executable you can copy anywhere.
-- **Multi-selection and the paste stack are implemented but off**, matching Maccy, where
-  `multiSelectionEnabled` currently ships as `false`.
-
-## Licence
-
-MIT, the same as Maccy.
+[MIT](LICENSE) — the same as Maccy.
