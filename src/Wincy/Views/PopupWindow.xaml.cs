@@ -85,6 +85,9 @@ public partial class PopupWindow : Window
         Deactivated += (_, _) => HidePopup();
         SizeChanged += (_, _) => RememberPreviewWidth();
 
+        // Honour a saved left-hand placement before the popup is ever shown.
+        LayoutPanes();
+
         // Create the HWND up front so the DWM effects and the tool-window style are in
         // place before the first Show, rather than flashing an unstyled frame.
         new WindowInteropHelper(this).EnsureHandle();
@@ -364,9 +367,10 @@ public partial class PopupWindow : Window
 
     private void RememberPreviewWidth()
     {
-        if (_previewOpen && PreviewColumn.ActualWidth > 100)
+        // Read the pane, not a fixed column: which column holds it depends on placement.
+        if (_previewOpen && PreviewPane.ActualWidth > 100)
         {
-            _state.Settings.PreviewWidth = PreviewColumn.ActualWidth;
+            _state.Settings.PreviewWidth = PreviewPane.ActualWidth;
         }
     }
 
@@ -474,19 +478,56 @@ public partial class PopupWindow : Window
         _previewOpen = open;
         _previewTimer.Stop();
 
+        LayoutPanes();
+
         if (open)
         {
-            PreviewColumn.Width = new GridLength(_state.Settings.PreviewWidth);
             PreviewPane.Visibility = Visibility.Visible;
             PreviewSplitter.Visibility = Visibility.Visible;
             UpdatePreview(_state.Navigator.SelectedItem);
         }
         else
         {
-            PreviewColumn.Width = GridLength.Auto;
             PreviewPane.Visibility = Visibility.Collapsed;
             PreviewSplitter.Visibility = Visibility.Collapsed;
         }
+
+        if (IsOpen)
+        {
+            Reposition(keepPosition: true);
+        }
+    }
+
+    /// <summary>
+    /// Places the list and the preview into the outer grid's columns according to the
+    /// preview-placement setting, and gives the list column the remaining space. The
+    /// two panes swap sides rather than the grid being rebuilt.
+    /// </summary>
+    private void LayoutPanes()
+    {
+        var previewOnLeft = _state.Settings.PreviewPlacement == PreviewPlacement.Left;
+
+        Grid.SetColumn(ContentPane, previewOnLeft ? 2 : 0);
+        Grid.SetColumn(PreviewPane, previewOnLeft ? 0 : 2);
+
+        var previewWidth = _previewOpen
+            ? new GridLength(_state.Settings.PreviewWidth)
+            : GridLength.Auto;
+        var contentWidth = new GridLength(1, GridUnitType.Star);
+
+        LeftColumn.Width = previewOnLeft ? previewWidth : contentWidth;
+        RightColumn.Width = previewOnLeft ? contentWidth : previewWidth;
+
+        // The divider always faces the list.
+        PreviewPane.BorderThickness = previewOnLeft
+            ? new Thickness(0, 0, 1, 0)
+            : new Thickness(1, 0, 0, 0);
+    }
+
+    /// <summary>Re-applies the placement after the setting changes.</summary>
+    public void ApplyPreviewPlacement()
+    {
+        LayoutPanes();
 
         if (IsOpen)
         {

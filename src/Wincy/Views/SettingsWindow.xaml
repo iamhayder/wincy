@@ -312,6 +312,18 @@
                             <ColumnDefinition Width="160" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
+                        <TextBlock Text="Show it on the" Style="{StaticResource SettingsLabel}" />
+                        <ComboBox Grid.Column="1" Width="220" HorizontalAlignment="Left"
+                                  ItemsSource="{Binding PreviewPlacements}"
+                                  DisplayMemberPath="Label" SelectedValuePath="Value"
+                                  SelectedValue="{Binding Settings.PreviewPlacement, Mode=TwoWay}" />
+                    </Grid>
+
+                    <Grid Style="{StaticResource Row}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
                         <TextBlock Text="After" Style="{StaticResource SettingsLabel}" />
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
                             <TextBox Width="90" Style="{StaticResource SettingsTextBox}"

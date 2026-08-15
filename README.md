@@ -7,6 +7,34 @@ Wincy is a Windows counterpart to [Maccy](https://maccy.app), Alex Rodionov's ma
 clipboard manager. It reproduces Maccy's behaviour and layout, but shares none of its
 code — this is a fresh implementation in C# on WPF and Win32.
 
+## Installing
+
+Grab the latest [release](https://github.com/iamhayder/wincy/releases):
+
+- **`Wincy-x.y.z-x64.msi`** — the installer. Adds a Start Menu entry and appears in Add
+  or Remove Programs, so it uninstalls like anything else.
+- **`Wincy-x.y.z-portable-x64.exe`** — the same application in a single file. Nothing to
+  install; run it from wherever you like.
+
+Either way the app is self-contained: there is no .NET runtime to install, and your
+history lives in `%LOCALAPPDATA%\Wincy`.
+
+Neither download is code-signed, so SmartScreen will warn the first time you run it.
+Choose **More info**, then **Run anyway**. Uninstalling leaves `%LOCALAPPDATA%\Wincy`
+in place, so reinstalling keeps your history — delete that folder to remove it.
+
+## Known limitations
+
+**Wincy cannot paste into windows running as administrator.** Windows blocks synthetic
+keystrokes from a normal-integrity process to an elevated one, so with an admin terminal,
+Task Manager or Registry Editor in front, choosing an item copies it but the paste does
+not arrive. Press Ctrl+V yourself in that case. Copying *from* elevated applications is
+recorded normally, since the clipboard itself is shared.
+
+There is no way around this that is worth the cost: running Wincy elevated would invert
+the problem and break pasting into ordinary applications, and the `uiAccess` route
+requires a code-signed binary installed under Program Files.
+
 ## Building
 
 Requires the **.NET 10 SDK** and Windows 10 1809 or newer.
@@ -28,6 +56,21 @@ dotnet publish src\Wincy -c Release -r win-x64 --self-contained -p:PublishSingle
 The runtime identifier is passed here rather than set in the project file on purpose.
 Pinning one to the Release configuration makes `restore` and `build -c Release` resolve
 different assets, which fails with NETSDK1047.
+
+To build the installer, point it at that executable:
+
+```powershell
+dotnet build installer\Wincy.Installer.wixproj -c Release -p:WincyExe=$PWD\publish\Wincy.exe -o installer\out
+# -> installer\out\Wincy.msi
+```
+
+The installer is a [WiX](https://wixtoolset.org) project and is deliberately **not** part
+of `Wincy.sln`, since building an MSI needs Windows and would otherwise stop the solution
+building on other platforms. CI builds it on every push, so a broken installer surfaces
+straight away rather than at release time.
+
+Tagging `v*` runs the release workflow, which builds both artefacts and publishes them to
+a GitHub Release.
 
 Only the .NET 10 SDK is a hard requirement of the TFM, not of the code. If you have the
 .NET 8 SDK instead, change one line in `src/Wincy/Wincy.csproj`:
@@ -144,8 +187,10 @@ src/Wincy/
 └── Themes/       colours and control styles, re-derived from the system theme
 
 tests/Wincy.Tests/
-                  clipboard format parsers, search, dedup, sorting,
-                  colour swatches, and the modifier matrix
+                  clipboard format parsers, search, dedup, sorting, colour
+                  swatches, screen placement, and the modifier matrix
+
+installer/        WiX sources for the MSI
 ```
 
 ## Tests
@@ -173,6 +218,9 @@ Some of Maccy's behaviour does not survive the move to Windows unchanged:
   Attention Sequence and cannot be intercepted by any application.
 - **Sounds are off by default.** Maccy plays one on every copy; the Windows alert sounds
   are assertive enough that doing the same reads as a fault. Turn it on in General.
+- **The preview does not open by itself.** Widening the window while you are reading the
+  list is disruptive unless you asked for it. Alt+Space opens it, and Appearance has both
+  the automatic setting and a choice of which side it appears on.
 - **Images are stored as PNG.** Maccy keeps the original representation; a Windows DIB is
   uncompressed, so a few hundred screenshots would run to gigabytes. A DIB is
   regenerated on paste, so compatibility is unaffected.

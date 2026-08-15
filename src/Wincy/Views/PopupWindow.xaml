@@ -199,14 +199,16 @@
 
     <Grid x:Name="Root">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="ContentColumn" Width="*" />
+            <!-- Which pane sits in which column depends on the preview-placement
+                 setting; see PopupWindow.LayoutPanes. -->
+            <ColumnDefinition x:Name="LeftColumn" Width="*" />
             <ColumnDefinition x:Name="SplitterColumn" Width="Auto" />
-            <ColumnDefinition x:Name="PreviewColumn" Width="Auto" />
+            <ColumnDefinition x:Name="RightColumn" Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <!-- ================================================ main column ==== -->
 
-        <Grid Grid.Column="0" Margin="5,0,5,0">
+        <Grid x:Name="ContentPane" Grid.Column="0" Margin="5,0,5,0">
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="HeaderRow" Height="Auto" />
                 <RowDefinition x:Name="StackRow" Height="Auto" />

@@ -140,6 +140,12 @@ public partial class SettingsWindow : Window, INotifyPropertyChanged
         new(HighlightMatch.Highlight, "Colour")
     ];
 
+    public IReadOnlyList<Option<PreviewPlacement>> PreviewPlacements { get; } =
+    [
+        new(PreviewPlacement.Right, "Right of the list"),
+        new(PreviewPlacement.Left, "Left of the list")
+    ];
+
     public IReadOnlyList<Option<SearchVisibility>> SearchVisibilities { get; } =
     [
         new(SearchVisibility.Always, "Always"),

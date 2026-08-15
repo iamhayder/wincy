@@ -33,8 +33,8 @@ jobs:
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal
 
-  publish:
-    name: Publish a single-file executable
+  package:
+    name: Package the executable and installer
     runs-on: windows-latest
     needs: build
 
@@ -48,7 +48,7 @@ jobs:
 
       # The runtime identifier belongs on this command, not in the project file:
       # see the comment in Wincy.csproj.
-      - name: Publish
+      - name: Publish the portable executable
         run: >
           dotnet publish src/Wincy/Wincy.csproj
           -c Release
@@ -57,9 +57,20 @@ jobs:
           -p:PublishSingleFile=true
           -o publish
 
-      - name: Upload the executable
+      # Built on every push, not only at release time, so a broken installer is
+      # caught here rather than when tagging.
+      - name: Build the installer
+        run: >
+          dotnet build installer/Wincy.Installer.wixproj
+          -c Release
+          -p:WincyExe=${{ github.workspace }}\publish\Wincy.exe
+          -o installer/out
+
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: Wincy
-          path: publish/Wincy.exe
+          path: |
+            publish/Wincy.exe
+            installer/out/Wincy.msi
           if-no-files-found: error

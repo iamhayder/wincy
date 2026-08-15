@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <!--
+    Wincy's installer.
+
+    Produces a per-machine MSI that puts the self-contained executable in Program
+    Files, adds a Start Menu shortcut, and registers with Add or Remove Programs so it
+    uninstalls like any other Windows application.
+
+    UpgradeCode must never change. It is what lets a new version recognise and replace
+    an older one rather than installing a second copy beside it.
+  -->
+
+  <Package Name="Wincy"
+           Manufacturer="Wincy"
+           Version="$(Version)"
+           UpgradeCode="9E4B7C21-5D3A-4F86-B1E0-7A2C6D9F4B58"
+           Scope="perMachine"
+           Compressed="yes">
+
+    <SummaryInformation Description="Clipboard history for Windows" Manufacturer="Wincy" />
+
+    <MajorUpgrade AllowSameVersionUpgrades="yes"
+                  DowngradeErrorMessage="A newer version of Wincy is already installed. Uninstall it first if you want to go back to this one." />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Wincy owns a clipboard listener and a global hotkey, so a running copy has to
+         close before its file can be replaced or deleted. -->
+    <util:CloseApplication Id="CloseWincy" Target="Wincy.exe" CloseMessage="yes" RebootPrompt="no" />
+
+    <!-- Add or Remove Programs entry -->
+    <Icon Id="Wincy.exe" SourceFile="$(WincyExe)" />
+    <Property Id="ARPPRODUCTICON" Value="Wincy.exe" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/iamhayder/wincy" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/iamhayder/wincy" />
+    <Property Id="ARPNOREPAIR" Value="1" />
+
+    <ui:WixUI Id="WixUI_Minimal" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(MSBuildThisFileDirectory)License.rtf" />
+
+    <Feature Id="Main" Title="Wincy" Level="1">
+      <ComponentGroupRef Id="ApplicationComponents" />
+      <ComponentGroupRef Id="ShortcutComponents" />
+    </Feature>
+
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="Wincy" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ShortcutFolder" Name="Wincy" />
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ApplicationComponents" Directory="INSTALLFOLDER">
+      <Component Id="WincyExecutable" Bitness="always64">
+        <File Id="WincyExeFile" Source="$(WincyExe)" KeyPath="yes" />
+      </Component>
+
+      <Component Id="CleanUpAutoStart" Bitness="always64" Guid="B7D2F149-8C36-4A5E-9D71-3E8F0A6C25B4">
+        <!--
+          Wincy writes its own "launch at login" entry when that setting is enabled.
+          Uninstalling must not leave a Run key pointing at a path that is gone.
+        -->
+        <RegistryValue Root="HKCU" Key="Software\Wincy"
+                       Name="Installed" Type="integer" Value="1" KeyPath="yes" />
+        <RemoveRegistryValue Root="HKCU"
+                             Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                             Name="Wincy" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ShortcutComponents" Directory="ShortcutFolder">
+      <Component Id="StartMenuShortcut" Guid="3A6E9B04-1F52-4C87-A0D3-5B29E7C81F60">
+        <Shortcut Id="WincyStartMenuShortcut"
+                  Name="Wincy"
+                  Description="Clipboard history for Windows"
+                  Target="[INSTALLFOLDER]Wincy.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RemoveFolder Id="RemoveShortcutFolder" On="uninstall" />
+        <!-- A shortcut cannot be a component's key path, so a per-user registry value
+             stands in. This is the conventional pattern. -->
+        <RegistryValue Root="HKCU" Key="Software\Wincy"
+                       Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+</Wix>

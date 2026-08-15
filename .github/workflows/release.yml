@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build, without the leading v (e.g. 1.0.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      # A tag push carries the version in the ref; a manual run takes it as input.
+      - name: Work out the version
+        id: version
+        shell: pwsh
+        run: |
+          if ('${{ github.event_name }}' -eq 'workflow_dispatch') {
+            $version = '${{ github.event.inputs.version }}'
+            $tag = "v$version"
+          } else {
+            $tag = '${{ github.ref_name }}'
+            $version = $tag -replace '^v', ''
+          }
+
+          if ($version -notmatch '^\d+\.\d+\.\d+$') {
+            throw "Version '$version' must be three numeric parts, as MSI requires."
+          }
+
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "tag=$tag"         >> $env:GITHUB_OUTPUT
+          Write-Host "Building $tag"
+
+      - name: Test
+        run: dotnet test -c Release
+
+      - name: Publish the portable executable
+        run: >
+          dotnet publish src/Wincy/Wincy.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:Version=${{ steps.version.outputs.version }}
+          -o publish
+
+      - name: Build the installer
+        run: >
+          dotnet build installer/Wincy.Installer.wixproj
+          -c Release
+          -p:Version=${{ steps.version.outputs.version }}
+          -p:WincyExe=${{ github.workspace }}\publish\Wincy.exe
+          -o installer/out
+
+      - name: Name the artefacts after the version
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          $v = '${{ steps.version.outputs.version }}'
+          Copy-Item installer/out/Wincy.msi "release/Wincy-$v-x64.msi"
+          Copy-Item publish/Wincy.exe       "release/Wincy-$v-portable-x64.exe"
+          Get-ChildItem release | Format-Table Name, Length
+
+      - name: Write the release notes
+        shell: pwsh
+        run: |
+          $v = '${{ steps.version.outputs.version }}'
+          @"
+          ## Installing
+
+          **Wincy-$v-x64.msi** — the installer. Adds a Start Menu entry and appears in
+          Add or Remove Programs, so it uninstalls like any other application.
+
+          **Wincy-$v-portable-x64.exe** — the same application as a single file. Nothing
+          to install; keeps its data in ``%LOCALAPPDATA%\Wincy`` either way.
+
+          Neither download is code-signed, so Windows SmartScreen will warn the first
+          time you run it. Choose **More info** then **Run anyway**.
+
+          ## Worth knowing
+
+          Wincy cannot paste into windows running as administrator. Windows blocks
+          synthetic keystrokes from a normal process to an elevated one. Copying *from*
+          those applications is recorded normally.
+
+          Your clipboard history stays on this machine. There is no network code in
+          this application.
+          "@ | Set-Content -Path notes.md -Encoding utf8
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create ${{ steps.version.outputs.tag }}
+          --title "Wincy ${{ steps.version.outputs.version }}"
+          --notes-file notes.md
+          release/*

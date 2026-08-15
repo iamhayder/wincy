@@ -357,6 +357,10 @@ public sealed class AppState : IDisposable
                     History.UpdateShortcuts();
                     break;
 
+                case nameof(AppSettings.PreviewPlacement):
+                    _popup?.ApplyPreviewPlacement();
+                    break;
+
                 case nameof(AppSettings.LaunchAtLogin):
                     StartupManager.SetEnabled(Settings.LaunchAtLogin);
                     break;
