@@ -2,15 +2,25 @@
 # endings here keeps diffs clean and stops Visual Studio and git disagreeing.
 * text=auto
 
-# Files Visual Studio and MSBuild are happiest reading as CRLF.
+# Visual Studio rewrites solution files with CRLF, so pinning it avoids pointless churn.
 *.sln       text eol=crlf
-*.csproj    text eol=crlf
-*.props     text eol=crlf
-*.targets   text eol=crlf
-*.manifest  text eol=crlf
+
+# Scripts that Windows shells execute directly.
 *.ps1       text eol=crlf
 *.cmd       text eol=crlf
 *.bat       text eol=crlf
+
+# Project files are stored with LF like everything else. They were pinned to CRLF, but
+# Dependabot commits through the GitHub API, which writes blob bytes directly and skips
+# the filter that normalises endings — so every automated package bump left a file whose
+# stored form disagreed with the rest of the repository. MSBuild and Visual Studio read
+# LF project files perfectly well.
+*.csproj    text
+*.wixproj   text
+*.props     text
+*.targets   text
+*.manifest  text
+*.wxs       text
 
 # Source and markup: LF in the repo, native on checkout.
 *.cs        text diff=csharp
