@@ -167,7 +167,12 @@ public sealed class AppSettings : INotifyPropertyChanged
     private int _imageMaxHeight = 40;
     public int ImageMaxHeight { get => _imageMaxHeight; set => Set(ref _imageMaxHeight, Math.Clamp(value, 1, 200)); }
 
-    private bool _openPreviewAutomatically = true;
+    private bool _openPreviewAutomatically;
+    /// <summary>
+    /// Off by default, unlike Maccy. The preview widens the window while you are
+    /// reading the list, which is disruptive unless you asked for it; Alt+Space opens
+    /// it on demand.
+    /// </summary>
     public bool OpenPreviewAutomatically
     {
         get => _openPreviewAutomatically;

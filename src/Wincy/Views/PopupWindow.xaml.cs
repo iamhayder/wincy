@@ -204,11 +204,22 @@ public partial class PopupWindow : Window
 
     /// <summary>
     /// Sizes the window to its content — capped by the configured maximum height and
-    /// floored at three rows — then places it according to the popup-position setting.
+    /// floored at three rows.
+    ///
+    /// <paramref name="keepPosition"/> matters more than it looks. The popup-position
+    /// setting is about where the window *appears*; re-deriving the origin afterwards
+    /// would re-read the cursor, so toggling the preview or even typing a character
+    /// would teleport an already-open window to wherever the mouse had drifted. Once
+    /// the popup is on screen it only ever changes size, staying where it was.
     /// </summary>
-    private void Reposition()
+    private void Reposition(bool keepPosition = false)
     {
-        var monitor = TargetMonitor();
+        if (_handle == IntPtr.Zero)
+        {
+            return;
+        }
+
+        var monitor = keepPosition ? ScreenHelper.FromWindow(_handle) : TargetMonitor();
         var scale = monitor.Scale;
 
         var widthDip = _state.Settings.WindowWidth + (_previewOpen ? _state.Settings.PreviewWidth + 4 : 0);
@@ -217,7 +228,19 @@ public partial class PopupWindow : Window
         var width = (int)Math.Round(widthDip * scale);
         var height = (int)Math.Round(heightDip * scale);
 
-        var (x, y) = Origin(width, height, monitor);
+        int x, y;
+        if (keepPosition)
+        {
+            // Anchor to the current top-left, then pull back inside the work area in
+            // case growing the preview pushed the window off the edge.
+            var bounds = WindowEffects.GetBounds(_handle);
+            (x, y) = ScreenHelper.Constrain(bounds.Left, bounds.Top, width, height, monitor);
+        }
+        else
+        {
+            (x, y) = Origin(width, height, monitor);
+        }
+
         WindowEffects.SetBounds(_handle, x, y, width, height);
     }
 
@@ -366,9 +389,11 @@ public partial class PopupWindow : Window
         SyncSearchVisibility();
         SyncPasteStack();
 
-        if (IsOpen)
+        // IsVisible is false during ShowPopup's first pass, before Show(); the initial
+        // placement happens there instead.
+        if (IsOpen && IsVisible)
         {
-            Reposition();
+            Reposition(keepPosition: true);
         }
     }
 
@@ -465,7 +490,7 @@ public partial class PopupWindow : Window
 
         if (IsOpen)
         {
-            Reposition();
+            Reposition(keepPosition: true);
         }
     }
 

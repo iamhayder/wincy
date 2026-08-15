@@ -334,7 +334,8 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <ScrollViewer Style="{StaticResource SlimScrollViewer}">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto">
                     <Grid>
                         <Image x:Name="PreviewImage" Stretch="Uniform" StretchDirection="DownOnly"
                                HorizontalAlignment="Left" VerticalAlignment="Top"
