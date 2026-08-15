@@ -1,0 +1,30 @@
+Wincy
+Copyright (c) 2026 Wincy contributors
+
+This product is licensed under the MIT License. See LICENSE for the full text.
+
+---
+
+Attribution
+
+Wincy is an independent Windows implementation inspired by Maccy
+(https://github.com/p0deje/Maccy), the macOS clipboard manager by Alex
+Rodionov, which is also MIT licensed.
+
+Wincy reproduces Maccy's behaviour and interaction design. It contains none of
+its source code: Maccy is written in Swift against AppKit and SwiftUI, while
+Wincy is written from scratch in C# against WPF and the Win32 API.
+
+---
+
+Third-party components
+
+The published application bundles the following, each under its own licence:
+
+  Microsoft.Data.Sqlite      MIT        https://github.com/dotnet/efcore
+  SQLitePCLRaw              Apache-2.0  https://github.com/ericsink/SQLitePCL.raw
+  SQLite                    Public domain, https://www.sqlite.org
+  .NET runtime and WPF      MIT        https://github.com/dotnet/wpf
+
+The installer is built with the WiX Toolset (MS-RL), which is a build-time
+dependency and is not distributed with the application.

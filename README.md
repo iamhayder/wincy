@@ -233,4 +233,5 @@ Some things could not carry over unchanged:
 
 ## License
 
-[MIT](LICENSE) — the same as Maccy.
+[MIT](LICENSE) — the same as Maccy. Attribution and the licences of bundled
+components are in [NOTICE](NOTICE).

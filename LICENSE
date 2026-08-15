@@ -19,10 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Wincy is an independent Windows implementation inspired by Maccy
-(https://github.com/p0deje/Maccy), the macOS clipboard manager by Alex
-Rodionov, which is also MIT licensed. Wincy reproduces Maccy's behaviour and
-interaction design; it contains none of its source code.
