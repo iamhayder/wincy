@@ -86,7 +86,7 @@ jobs:
           Add or Remove Programs, so it uninstalls like any other application.
 
           **Wincy-$v-portable-x64.exe** — the same application as a single file. Nothing
-          to install; keeps its data in ``%LOCALAPPDATA%\Wincy`` either way.
+          to install. Either way it keeps its data in %LOCALAPPDATA%\Wincy.
 
           Neither download is code-signed, so Windows SmartScreen will warn the first
           time you run it. Choose **More info** then **Run anyway**.
@@ -104,8 +104,16 @@ jobs:
       - name: Create the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: >
-          gh release create ${{ steps.version.outputs.tag }}
-          --title "Wincy ${{ steps.version.outputs.version }}"
-          --notes-file notes.md
-          release/*
+        shell: pwsh
+        run: |
+          # The files are listed explicitly rather than passed as release/*.
+          # PowerShell does not expand wildcards for native commands, and gh is a Go
+          # binary that does not expand them either, so a glob would arrive literally.
+          $files = (Get-ChildItem release -File).FullName
+          if (-not $files) { throw 'No artefacts were produced.' }
+          $files | ForEach-Object { Write-Host "attaching $_" }
+
+          gh release create '${{ steps.version.outputs.tag }}' `
+            --title 'Wincy ${{ steps.version.outputs.version }}' `
+            --notes-file notes.md `
+            $files
