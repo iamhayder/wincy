@@ -4,6 +4,15 @@
     <OutputName>Wincy</OutputName>
     <OutputType>Package</OutputType>
     <InstallerPlatform>x64</InstallerPlatform>
+
+    <!--
+      ICE61 objects that the upgrade range covers the current version as well as older
+      ones. That is exactly what AllowSameVersionUpgrades asks for, and it is wanted
+      here: WiX mints a fresh ProductCode on every build, so without it, installing a
+      rebuilt 1.0.0 over an existing 1.0.0 would leave two entries in Add or Remove
+      Programs instead of replacing the first.
+    -->
+    <SuppressIces>ICE61</SuppressIces>
     <!-- MSI product versions are three-part; a fourth would be ignored for upgrade
          detection and quietly break version-to-version upgrades. -->
     <Version Condition="'$(Version)' == ''">1.0.0</Version>
