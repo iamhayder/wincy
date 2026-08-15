@@ -9,7 +9,14 @@
     <Version Condition="'$(Version)' == ''">1.0.0</Version>
     <!-- Path to the published single-file executable, supplied by the build command. -->
     <WincyExe Condition="'$(WincyExe)' == ''">$(MSBuildThisFileDirectory)..\publish\Wincy.exe</WincyExe>
-    <DefineConstants>WincyExe=$(WincyExe)</DefineConstants>
+    <LicenseRtf>$(MSBuildThisFileDirectory)License.rtf</LicenseRtf>
+
+    <!--
+      MSBuild properties are not visible to the WiX preprocessor. Anything Package.wxs
+      refers to as $(Name) has to be handed over explicitly here, which is also why the
+      .wxs cannot use MSBuild-only values such as $(MSBuildThisFileDirectory).
+    -->
+    <DefineConstants>WincyExe=$(WincyExe);Version=$(Version);LicenseRtf=$(LicenseRtf)</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

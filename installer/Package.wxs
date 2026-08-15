@@ -40,7 +40,7 @@
     <Property Id="ARPNOREPAIR" Value="1" />
 
     <ui:WixUI Id="WixUI_Minimal" />
-    <WixVariable Id="WixUILicenseRtf" Value="$(MSBuildThisFileDirectory)License.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(LicenseRtf)" />
 
     <Feature Id="Main" Title="Wincy" Level="1">
       <ComponentGroupRef Id="ApplicationComponents" />
