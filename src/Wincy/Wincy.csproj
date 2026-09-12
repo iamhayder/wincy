@@ -37,7 +37,7 @@
   <ItemGroup>
     <!-- 9.0.0 resolved SQLitePCLRaw 2.1.10, which carries GHSA-2m69-gcr7-jv3q.
          This line pulls 2.1.12. -->
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
   </ItemGroup>
 
   <ItemGroup>
